@@ -1,6 +1,6 @@
 let cells = null;
 let block = null;
-let pixelRatio = 1 / 400; // pixels = dbus / pixel_ratio - autoscale based on block size
+let pixelRatio = 1 / 400; // pixels = dbus * pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
