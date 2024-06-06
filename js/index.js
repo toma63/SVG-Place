@@ -1,6 +1,6 @@
 let cells = null;
 let block = null;
-const pixelRatio = 400; // pixels = dbus / pixel_ratio
+let pixelRatio = 1 / 400; // pixels = dbus / pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
@@ -30,11 +30,11 @@ document.getElementById('block-file').addEventListener('change', function() {
 
 // adjust y for lower left origin
 function fixY(blockY) {
-    return canvas.getAttribute('height') - (blockY / pixelRatio);    
+    return canvas.getAttribute('height') - (blockY * pixelRatio);    
 }
 
 function scaleToPix(blockX) {
-    return blockX / pixelRatio; 
+    return blockX * pixelRatio; 
 }
 
 function addRect(x, y, w, h, id, cssClass) {
@@ -52,8 +52,11 @@ function addRect(x, y, w, h, id, cssClass) {
 function displayBlock() {
     
     // scale the canvas to match the block
-    canvas.setAttribute('width', (block.area[1].x - block.area[0].x) / pixelRatio);
-    canvas.setAttribute('height', (block.area[1].y - block.area[0].y) / pixelRatio);
+    let blockDBUWidth = block.area[1].x - block.area[0].x;
+    let blockDBUHeight = block.area[1].y - block.area[0].y;
+    pixelRatio = 1000 / blockDBUWidth;
+    canvas.setAttribute('width', blockDBUWidth * pixelRatio);
+    canvas.setAttribute('height', blockDBUHeight * pixelRatio);
     
     // display the placement rows
     for (let rowDef of block.rows) {
