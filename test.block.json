@@ -3,5 +3,5 @@
  "sites" : {"core" : {"width" : 460, "height" : 2720}},
  "area": [{"x" : 0, "y" : 0}, {"x" : 276000, "y" : 272000}],
  "rows" : [
-    {"name" : "row0", "site" : "core", "x:" : 55200, "y" : 54280, "xsteps" : 480, "ysteps" : 80}
+    {"name" : "row0", "site" : "core", "x" : 55200, "y" : 54280, "xsteps" : 480, "ysteps" : 80}
  ]}

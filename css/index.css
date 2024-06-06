@@ -1,0 +1,11 @@
+#svg-canvas {
+    border: 5px;
+    border-style:solid;
+    border-color: black;
+    margin: 50px;
+}
+.row-rect {
+    stroke: blue;
+    stroke-width: 2;
+}
+
