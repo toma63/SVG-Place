@@ -3,5 +3,8 @@
  "sites" : {"core" : {"width" : 460, "height" : 2720}},
  "area": [{"x" : 0, "y" : 0}, {"x" : 276000, "y" : 272000}],
  "rows" : [
-    {"name" : "row0", "site" : "core", "x:" : 55200, "y" : 54280, "xsteps" : 480, "ysteps" : 80}
+    {"name" : "row0", "site" : "core", "x" : 27600, "y" : 27140, "xsteps" : 480, "ysteps" : 80}
+ ],
+ "components" : [
+    {"name" : "u327", "master" : "sky130_fd_sc_hd__nand2_1", "placed" : {"x" : 27600, "y" : 27140}}
  ]}
