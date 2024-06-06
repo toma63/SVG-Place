@@ -50,9 +50,11 @@ function addRect(x, y, w, h, id, cssClass) {
 
 // Update the svg canvas when a block definition is loaded
 function displayBlock() {
+    
     // scale the canvas to match the block
     canvas.setAttribute('width', (block.area[1].x - block.area[0].x) / pixelRatio);
     canvas.setAttribute('height', (block.area[1].y - block.area[0].y) / pixelRatio);
+    
     // display the placement rows
     for (let rowDef of block.rows) {
         let xStep = block.sites[rowDef.site].width;
@@ -60,6 +62,17 @@ function displayBlock() {
         for (let rowNum = 0 ; rowNum < rowDef.ysteps ; rowNum++) {
             let rowWidth = xStep * rowDef.xsteps ;
             addRect(rowDef.x, rowDef.y + rowNum * yStep, rowWidth, yStep, rowDef.name + `_${rowNum}`, 'row-rect');
+        }
+    }
+
+    // display placed cells
+    if (cells) {
+        for (let comp of block.components) {
+            let cell = cells[comp.master];
+            if (! cell) {
+                throw(`master ${comp.master} not defined`);
+            }
+            addRect(comp.placed.x, comp.placed.y, cell.size.width, cell.size.height, comp.name, 'placed-cell');
         }
     }
 }

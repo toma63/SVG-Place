@@ -9,4 +9,9 @@
     stroke-width: 1;
     fill:none;
 }
+.placed-cell {
+    stroke:aquamarine;
+    stroke-width: 1;
+    fill:aqua;
+}
 
