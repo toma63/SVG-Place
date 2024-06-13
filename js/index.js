@@ -2,6 +2,16 @@ let cells = null;
 let block = null;
 let pixelRatio = 1 / 400; // pixels = dbus * pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
+
+// set up pan/zoom
+    const panZoomInstance = svgPanZoom('#svg-canvas', {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true
+    });
+
+
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
     let file = this.files[0];
@@ -45,7 +55,7 @@ function addRect(x, y, w, h, id, cssClass) {
     rect.setAttribute('height', scaleToPix(h));
     rect.setAttribute('id', id);
     rect.setAttribute('class', cssClass);
-    canvas.appendChild(rect);
+    canvas.firstChild.appendChild(rect);
 }
 
 // Update the svg canvas when a block definition is loaded
