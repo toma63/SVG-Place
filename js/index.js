@@ -2,15 +2,7 @@ let cells = null;
 let block = null;
 let pixelRatio = 1 / 400; // pixels = dbus * pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
-
-// set up pan/zoom
-    const panZoomInstance = svgPanZoom('#svg-canvas', {
-        zoomEnabled: true,
-        controlIconsEnabled: true,
-        fit: true,
-        center: true
-    });
-
+canvasContainer = document.getElementById('svg-container');
 
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
@@ -55,7 +47,14 @@ function addRect(x, y, w, h, id, cssClass) {
     rect.setAttribute('height', scaleToPix(h));
     rect.setAttribute('id', id);
     rect.setAttribute('class', cssClass);
-    canvas.firstChild.appendChild(rect);
+    canvas.appendChild(rect);
+}
+
+// full viewBox string
+function setFullViewBox() {
+    vw = canvas.getAttribute('width');
+    vh = canvas.getAttribute('height');
+    canvas.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
 }
 
 // Update the svg canvas when a block definition is loaded
@@ -89,3 +88,64 @@ function displayBlock() {
         }
     }
 }
+
+// get a selected box for zooming
+let rubberbandRect = null;
+let startX, startY;
+
+// convert to SVG coordinates
+function getSVGCoords(event) {
+    const svgPoint = canvas.createSVGPoint();
+    svgPoint.x = event.clientX;
+    svgPoint.y = event.clientY;
+    const transformedPoint = svgPoint.matrixTransform(canvas.getScreenCTM().inverse());
+    return { x: transformedPoint.x, y: transformedPoint.y };
+}
+
+// start zoom box rubberbanding
+canvas.addEventListener('mousedown', function(event) {
+    const coords = getSVGCoords(event);
+    startX = coords.x;
+    startY = coords.y;
+  
+    rubberbandRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rubberbandRect.setAttribute('x', startX);
+    rubberbandRect.setAttribute('y', startY);
+    rubberbandRect.setAttribute('width', 0);
+    rubberbandRect.setAttribute('height', 0);
+    rubberbandRect.setAttribute('stroke', 'black');
+    rubberbandRect.setAttribute('stroke-width', '1');
+    rubberbandRect.setAttribute('fill', 'none');
+    rubberbandRect.setAttribute('id', 'rubber-rect');
+    canvas.appendChild(rubberbandRect);
+  
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseup', onMouseUp);
+  });
+
+  // update rubberband box on mouse movement
+  function onMouseMove(event) {
+    const coords = getSVGCoords(event);
+    const width = Math.abs(coords.x - startX);
+    const height = Math.abs(coords.y - startY);
+  
+    rubberbandRect.setAttribute('width', width);
+    rubberbandRect.setAttribute('height', height);
+    rubberbandRect.setAttribute('x', Math.min(coords.x, startX));
+    rubberbandRect.setAttribute('y', Math.min(coords.y, startY));
+  }
+
+  // on mouseup, hide rubberband box and perform zoom
+  function onMouseUp(event) {
+    canvas.removeEventListener('mousemove', onMouseMove);
+    canvas.removeEventListener('mouseup', onMouseUp);
+    canvas.setAttribute('viewBox', `${rubberbandRect.x.baseVal.value} ${rubberbandRect.y.baseVal.value} ${rubberbandRect.width.baseVal.value} ${rubberbandRect.height.baseVal.value}`);
+    rubberbandRect.remove();
+}
+
+// zoom full on hotkey 'f' (70)
+document.addEventListener('keyup', function(event) {
+    if (event.key === 70) { // 'f' key pressed
+        setFullViewBox();
+    }
+});
