@@ -2,7 +2,8 @@ let cells = null;
 let block = null;
 let pixelRatio = 1 / 400; // pixels = dbus * pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
-canvasContainer = document.getElementById('svg-container');
+let viewBox = {x: 0, y:0, width: 1000, height: 1000};
+let panDelta = 50;
 
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
@@ -55,6 +56,7 @@ function setFullViewBox() {
     vw = canvas.getAttribute('width');
     vh = canvas.getAttribute('height');
     canvas.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+    viewBox = {x: 0, y: 0, width: vw, height: vh};
 }
 
 // Update the svg canvas when a block definition is loaded
@@ -64,8 +66,12 @@ function displayBlock() {
     let blockDBUWidth = block.area[1].x - block.area[0].x;
     let blockDBUHeight = block.area[1].y - block.area[0].y;
     pixelRatio = 1000 / blockDBUWidth;
-    canvas.setAttribute('width', blockDBUWidth * pixelRatio);
-    canvas.setAttribute('height', blockDBUHeight * pixelRatio);
+    let cWidth = blockDBUWidth * pixelRatio;
+    let cHeight = blockDBUHeight * pixelRatio;
+    canvas.setAttribute('width', cWidth);
+    canvas.setAttribute('height', cHeight);
+    viewBox.width = cWidth;
+    viewBox.height = cHeight;
     
     // display the placement rows
     for (let rowDef of block.rows) {
@@ -139,13 +145,50 @@ canvas.addEventListener('mousedown', function(event) {
   function onMouseUp(event) {
     canvas.removeEventListener('mousemove', onMouseMove);
     canvas.removeEventListener('mouseup', onMouseUp);
-    canvas.setAttribute('viewBox', `${rubberbandRect.x.baseVal.value} ${rubberbandRect.y.baseVal.value} ${rubberbandRect.width.baseVal.value} ${rubberbandRect.height.baseVal.value}`);
+    viewBox.x = rubberbandRect.x.baseVal.value;
+    viewBox.y = rubberbandRect.y.baseVal.value;
+    viewBox.width = rubberbandRect.width.baseVal.value;
+    viewBox.height = rubberbandRect.height.baseVal.value;
+    updateViewBox();
     rubberbandRect.remove();
+}
+
+function updateViewBox() {
+    canvas.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+}
+
+function panRight() {
+    viewBox.x += panDelta;
+    updateViewBox();
+}
+
+function panLeft() {
+    viewBox.x -= panDelta;
+    updateViewBox();
+}
+
+function panUp() {
+    viewBox.y -= panDelta;
+    updateViewBox();
+}
+
+function panDown() {
+    viewBox.y += panDelta;
+    updateViewBox();
 }
 
 // zoom full on hotkey 'f' (70)
 document.addEventListener('keyup', function(event) {
-    if (event.key === 70) { // 'f' key pressed
+    //console.log("keycode: ", event.key);
+    if (event.key === 'f') { // 'f' key pressed
         setFullViewBox();
+    } else if (event.key === 'ArrowRight') {
+        panRight();
+    } else if (event.key === 'ArrowLeft') {
+        panLeft();
+    } else if (event.key === 'ArrowUp') {
+        panUp();
+    } else if (event.key === 'ArrowDown') {
+        panDown();
     }
 });
