@@ -3,7 +3,9 @@ let block = null;
 let pixelRatio = 1 / 400; // pixels = dbus * pixel_ratio - autoscale based on block size
 canvas = document.getElementById("svg-canvas");
 let viewBox = {x: 0, y:0, width: 1000, height: 1000};
-let panDelta = 50;
+let panFraction = 0.1;
+let panDeltaV = panFraction * viewBox.height;
+let panDeltaH = panFraction * viewBox.width;
 
 // load the cell definition JSON file
 document.getElementById('cell-file').addEventListener('change', function() {
@@ -155,25 +157,28 @@ canvas.addEventListener('mousedown', function(event) {
 
 function updateViewBox() {
     canvas.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+    // set pan amount to fraction of of viewBox
+    panDeltaV = viewBox.height * panFraction;
+    panDeltaH = viewBox.width * panFraction;  
 }
 
 function panRight() {
-    viewBox.x += panDelta;
+    viewBox.x += panDeltaH;
     updateViewBox();
 }
 
 function panLeft() {
-    viewBox.x -= panDelta;
+    viewBox.x -= panDeltaH;
     updateViewBox();
 }
 
 function panUp() {
-    viewBox.y -= panDelta;
+    viewBox.y -= panDeltaV;
     updateViewBox();
 }
 
 function panDown() {
-    viewBox.y += panDelta;
+    viewBox.y += panDeltaV;
     updateViewBox();
 }
 
